@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>دفتر المحل</title>
+    <link rel="icon" href="2c20fdc7cce65e88e0f8a386a40fbac4.jpg" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{cairo:['Cairo','sans-serif']}}}}</script>
@@ -132,14 +133,33 @@ function sdL(){try{localStorage.setItem(SK,JSON.stringify(AD))}catch(e){}}
 function ldFB(){if(!fbOK||!fbDB)return Promise.resolve(null);return new Promise(resolve=>{const timer=setTimeout(()=>resolve(null),6000);fbDB.collection('shops').doc('main').get().then(doc=>{clearTimeout(timer);if(doc.exists){const d=doc.data();if(d._updatedAt&&typeof d._updatedAt.toDate==='function')d._updatedAt=d._updatedAt.toDate().toISOString();resolve(d)}else resolve(null)}).catch(e=>{clearTimeout(timer);console.error('FB ld:',e);resolve(null)})})}
 
 let _st=null;
-function sd(){sdL();if(!fbOK||!fbDB){setSS('offline');return}setSS('wait');clearTimeout(_st);_st=setTimeout(async()=>{try{fbW=true;await fbDB.collection('shops').doc('main').set({...AD,_updatedAt:firebase.firestore.FieldValue.serverTimestamp()});fbW=false;setSS('synced')}catch(e){fbW=false;setSS('offline');console.error('FB sv:',e)}},2000)}
+function sd(){
+    sdL();
+    if(!fbOK||!fbDB){setSS('offline');return;}
+    setSS('wait');
+    clearTimeout(_st);
+    // مزامنة فورية بدون تأخير
+    fbW = true;
+    fbDB.collection('shops').doc('main').set({
+        ...AD,
+        _updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        fbW = false;
+        setSS('synced');
+        // toast('تم المزامنة ✓'); // علقناها عشان متظهرش كل شوية
+    }).catch(e => {
+        fbW = false;
+        setSS('offline');
+        console.error('FB sv:', e);
+    });
+}
 
 function setupSync(){if(!fbOK||!fbDB)return;try{fbUnsub=fbDB.collection('shops').doc('main').onSnapshot(doc=>{if(fbW)return;if(doc.exists){const r=doc.data();const rt=r._updatedAt?(typeof r._updatedAt.toDate==='function'?r._updatedAt.toDate().getTime():new Date(r._updatedAt).getTime()):0;const lt=AD._updatedAt?new Date(AD._updatedAt).getTime():0;if(rt>lt){if(r._updatedAt&&typeof r._updatedAt.toDate==='function')r._updatedAt=r._updatedAt.toDate().toISOString();AD=r;if(!AD.customers)AD.customers=[];if(!AD.merchandise)AD.merchandise=[];if(!AD.products||AD.products.length===0)AD.products=mkP();if(!AD.settings)AD.settings={darkMode:false};sdL();initDM();if(CP==='home')renderH();else if(CP==='customers')renderC();else if(CP==='merchandise')renderM();else if(CP==='prices')renderP();toast('بيانات جديدة من تلفون تاني','info')}setSS('synced')}},()=>setSS('offline'))}catch(e){setSS('offline')}}
 
 async function forceSync(){if(!fbOK||!fbDB){Swal.fire({icon:'warning',title:'Firebase مش متاح',confirmButtonText:'فهمت'});return}setSS('wait');try{await fbDB.collection('shops').doc('main').set({...AD,_updatedAt:firebase.firestore.FieldValue.serverTimestamp()});setSS('synced');toast('تم المزامنة ✓')}catch(e){setSS('offline');toast('فشلت المزامنة','error')}}
 
 // مزامنة خلفية (من غير ما تقف التطبيق)
-async function bgSync(){if(!fbOK||!fbDB){setSS('offline');return}setSS('wait');try{const remote=await ldFB();if(remote){const rt=remote._updatedAt?new Date(remote._updatedAt).getTime():0;const lt=AD._updatedAt?new Date(AD._updatedAt).getTime():0;if(rt>lt||!AD._updatedAt){AD=remote;if(!AD.customers)AD.customers=[];if(!AD.merchandise)AD.merchandise=[];if(!AD.products||AD.products.length===0)AD.products=mkP();if(!AD.settings)AD.settings={darkMode:false};sdL();initDM();if(CP==='home')renderH();else if(CP==='customers')renderC();else if(CP==='merchandise')renderM();else if(CP==='prices')renderP()}else if(lt>rt){sd()}}else{sd()}setSS('synced')}catch(e){setSS('offline');console.error('bgSync fail:',e)}}
+async function bgSync(){if(!fbOK||!fbDB){setSS('offline');return;}setSS('wait');try{const remote=await ldFB();if(remote){const rt=remote._updatedAt?new Date(remote._updatedAt).getTime():0;const lt=AD._updatedAt?new Date(AD._updatedAt).getTime():0;if(rt>lt||!AD._updatedAt){AD=remote;if(!AD.customers)AD.customers=[];if(!AD.merchandise)AD.merchandise=[];if(!AD.products||AD.products.length===0)AD.products=mkP();if(!AD.settings)AD.settings={darkMode:false};sdL();initDM();if(CP==='home')renderH();else if(CP==='customers')renderC();else if(CP==='merchandise')renderM();else if(CP==='prices')renderP()}else if(lt>rt){sd()}}else{sd()}setSS('synced')}catch(e){setSS('offline');console.error('bgSync fail:',e)}}
 
 /* ===== التطبيع ===== */
 const WN={'ببسي':'بيبيسي','بيبسى':'بيبيسي','بيبسي':'بيبيسي','بيبس':'بيبيسي','بيبيسى':'بيبيسي','جبنه':'جبنة','جبن':'جبنة','مايه':'مايه','ماية':'مايه','ميه':'مايه','ميا':'مايه','مكرونه':'مكرونه','مكرونة':'مكرونه','صلصه':'صلصه','صلصة':'صلصه','دومتي':'دومتي','دامتي':'دومتي','بيضه':'بيضه','بيضة':'بيضه','بلوبيف':'بلوبيف','لنشون':'لنشون','لانشون':'لنشون','رز':'رز','أرز':'رز','ارز':'رز','تونه':'تونه','تونة':'تونه','نسكافيه':'نسكافيه','نيسكافيه':'نسكافيه','فانيليا':'فانيليا','فانيلا':'فانيليا','كباتشنو':'كباتشنو','كاتشب':'كاتشب','طحينه':'طحينه','طحينة':'طحينه','مربي':'مربي','مربى':'مربي','اندومي':'إندومي','إندومي':'إندومي','ندومي':'إندومي','شيبسي':'شيبسي','سكر':'السكر','دقيق':'دقيق','بقسماط':'بقسماط','شاي':'شاي','خل':'خل','زيت':'زيت','فول':'فول','سردين':'سردين','راني':'راني','كنز':'كنز','لتر':'لتر','كيلو':'كيلو','كجم':'كجم','صغير':'صغير','صغيره':'صغير','كبير':'كبير','كبيره':'كبير'};
@@ -201,11 +221,13 @@ function hImp(e){const f=e.target.files[0];if(!f)return;const r=new FileReader()
 function clearAllData(){Swal.fire({icon:'warning',title:'مسح كل البيانات؟',showCancelButton:true,confirmButtonText:'امسح',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444'}).then(r=>{if(r.isConfirmed){AD=defAD();AD._updatedAt=nw();sd();renderAll();toast('تم مسح الكل','info')}})}
 function renderAll(){renderH();renderC();renderM();renderP()}
 
-/* ===== التهيئة - المُصلَحة ===== */
+/* ===== التهيئة ===== */
 function init(){
     try{initFB()}catch(e){fbOK=false}
     try{const local=ldL();AD=local||defAD()}catch(e){AD=defAD()}
     try{initDM()}catch(e){}
+    
+    // مزامنة فورية عند بدء التشغيل
     setTimeout(()=>{
         try{
             const ls=document.getElementById('ls');
@@ -215,8 +237,15 @@ function init(){
                 document.getElementById('app').classList.remove('hidden');
                 try{switchPage('home')}catch(e){console.error('render:',e)}
                 try{if(typeof AOS!=='undefined')AOS.init({duration:600,once:true,offset:50})}catch(e){}
+                // مزامنة خلفية سريعة
                 bgSync();
                 setupSync();
+                // مزامنة كل 5 ثواني للتأكيد
+                setInterval(() => {
+                    if(fbOK && fbDB) {
+                        bgSync();
+                    }
+                }, 5000);
             },500);
         }catch(e){console.error('show app:',e)}
     },1500);
