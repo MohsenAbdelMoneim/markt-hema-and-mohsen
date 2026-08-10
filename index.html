@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دفتر المحل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="2c20fdc7cce65e88e0f8a386a40fbac4.jpg" type="image/x-icon">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config={darkMode:'class',theme:{extend:{fontFamily:{cairo:['Cairo','sans-serif']}}}}
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        *{font-family:'Cairo',sans-serif}
+        :root{--em:#059669;--em-l:#10b981;--em-d:#047857;--bg:#f0fdf4;--card:#fff;--tx:#1a1a2e;--mu:#6b7280;--bd:#e5e7eb;--ac:#f59e0b;--dg:#ef4444}
+        .dark{--bg:#0f172a;--card:#1e293b;--tx:#f1f5f9;--mu:#94a3b8;--bd:#334155;--ac:#fbbf24;--dg:#f87171}
+        body{background:var(--bg);color:var(--tx)}
+        .cs{background:var(--card);border:1px solid var(--bd)}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--em);border-radius:3px}
+        #ls{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#047857,#059669 40%,#10b981);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s,visibility .6s}
+        #ls.fo{opacity:0;visibility:hidden}
+        .lb{width:60px;height:45px;position:relative;margin-bottom:24px}
+        .lb span{display:block;position:absolute;width:30px;height:45px;border-radius:2px 8px 8px 2px;background:rgba(255,255,255,.9)}
+        .lb span:first-child{right:0;transform-origin:right center;animation:fR 1.2s infinite ease-in-out}
+        .lb span:last-child{left:0;border-radius:8px 2px 2px 8px;transform-origin:left center;animation:fL 1.2s infinite ease-in-out}
+        @keyframes fR{0%,100%{transform:rotateY(0)}50%{transform:rotateY(-30deg)}}
+        @keyframes fL{0%,100%{transform:rotateY(0)}50%{transform:rotateY(30deg)}}
+        .lbr{width:120px;height:4px;background:rgba(255,255,255,.25);border-radius:2px;overflow:hidden;margin-top:20px}
+        .lbr i{display:block;width:0;height:100%;background:#fff;border-radius:2px;animation:lB 2s forwards ease-out}
+        @keyframes lB{to{width:100%}}
+        .pt{animation:pT 2s infinite}@keyframes pT{0%,100%{opacity:1}50%{opacity:.5}}
+        .pg{display:none;animation:fU .3s ease}.pg.ac{display:block}
+        @keyframes fU{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+        .pb{height:8px;border-radius:4px;background:var(--bd);overflow:hidden}
+        .pf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--em),var(--em-l));transition:width .5s}
+        .qb{transition:transform .15s,box-shadow .15s}.qb:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(5,150,105,.25)}.qb:active{transform:translateY(0)}
+        .cc{transition:transform .2s,box-shadow .2s}.cc:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.1)}
+        .bp{background:#d1fae5;color:#065f46}.bu{background:#fee2e2;color:#991b1b}
+        .dark .bp{background:#064e3b;color:#6ee7b7}.dark .bu{background:#7f1d1d;color:#fca5a5}
+        .pm{background:#fef3c7;color:#92400e}.dark .pm{background:#78350f;color:#fde68a}
+        .swal2-popup{font-family:'Cairo',sans-serif!important}
+        .debug-line{font-size:11px;padding:2px 6px;border-radius:4px;margin:1px 0}
+        .debug-ok{background:#d1fae5;color:#065f46}
+        .debug-fail{background:#fee2e2;color:#991b1b}
+        .debug-name{background:#dbeafe;color:#1e40af;font-weight:700}
+    </style>
+</head>
+<body class="min-h-screen">
+
+<div id="ls">
+    <div class="lb"><span></span><span></span></div>
+    <h1 class="text-white text-2xl font-bold mb-2">دفتر المحل</h1>
+    <p class="text-emerald-100 text-lg pt mb-4">بنجهزلك الحسابات يا هندسة...</p>
+    <div class="lbr"><i></i></div>
+    <p class="text-emerald-200 text-sm mt-8">أشرف مهندس محسن</p>
+</div>
+
+<div id="app" class="hidden">
+    <aside id="sidebar" class="fixed right-0 top-0 w-72 h-full cs shadow-xl z-40 hidden lg:flex flex-col overflow-y-auto">
+        <div class="p-6 border-b" style="border-color:var(--bd)">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center"><i data-lucide="book-open" class="w-5 h-5 text-white"></i></div>
+                <div><h2 class="font-bold text-lg" style="color:var(--tx)">دفتر المحل</h2><p class="text-xs" style="color:var(--mu)">إدارة حسابات البقالة</p></div>
+            </div>
+        </div>
+        <nav class="flex-1 p-4 space-y-1">
+            <button onclick="switchPage('home')" data-page="home" class="sl w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all"><i data-lucide="layout-dashboard" class="w-5 h-5"></i> الرئيسية</button>
+            <button onclick="switchPage('customers')" data-page="customers" class="sl w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all"><i data-lucide="users" class="w-5 h-5"></i> الشكك</button>
+            <button onclick="switchPage('merchandise')" data-page="merchandise" class="sl w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all"><i data-lucide="package" class="w-5 h-5"></i> البضاعة</button>
+            <button onclick="switchPage('prices')" data-page="prices" class="sl w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all"><i data-lucide="store" class="w-5 h-5"></i> الأسعار</button>
+        </nav>
+        <div class="p-4 border-t space-y-2" style="border-color:var(--bd)">
+            <button onclick="toggleDark()" class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm transition-all hover:bg-gray-100 dark:hover:bg-gray-700" style="color:var(--mu)"><i data-lucide="moon" class="w-4 h-4"></i><span>الوضع الداكن</span></button>
+            <button onclick="exportData()" class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm transition-all hover:bg-gray-100 dark:hover:bg-gray-700" style="color:var(--mu)"><i data-lucide="download" class="w-4 h-4"></i> تصدير البيانات</button>
+            <button onclick="importData()" class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm transition-all hover:bg-gray-100 dark:hover:bg-gray-700" style="color:var(--mu)"><i data-lucide="upload" class="w-4 h-4"></i> استيراد البيانات</button>
+            <button onclick="clearAllData()" class="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm text-red-500 transition-all hover:bg-red-50 dark:hover:bg-red-900/20"><i data-lucide="trash-2" class="w-4 h-4"></i> مسح كل البيانات</button>
+        </div>
+    </aside>
+
+    <div id="main-wrapper" class="lg:pr-72 pb-20 lg:pb-0 min-h-screen flex flex-col">
+        <header class="sticky top-0 z-30 cs shadow-sm px-4 py-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleMS()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><i data-lucide="menu" class="w-5 h-5"></i></button>
+                <h1 id="pt" class="font-bold text-lg" style="color:var(--tx)">الرئيسية</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleDark()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"><i data-lucide="moon" class="w-5 h-5"></i></button>
+                <button onclick="exportData()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="تصدير"><i data-lucide="download" class="w-5 h-5"></i></button>
+            </div>
+        </header>
+
+        <main class="flex-1 p-4 lg:p-6 max-w-6xl w-full mx-auto">
+            <!-- الرئيسية -->
+            <section id="page-home" class="pg ac">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6" id="hs"></div>
+                <div class="mb-6"><h3 class="font-bold text-lg mb-3" style="color:var(--tx)">أزرار سريعة</h3><div class="grid grid-cols-3 gap-3" id="hq"></div></div>
+                <div><h3 class="font-bold text-lg mb-3" style="color:var(--tx)">آخر العمليات</h3><div id="hr" class="space-y-2"></div></div>
+            </section>
+
+            <!-- الشكك -->
+            <section id="page-customers" class="pg">
+                <div class="mb-4">
+                    <label class="block font-semibold mb-2" style="color:var(--tx)">حط الشكك هنا</label>
+                    <textarea id="cta" rows="8" class="w-full rounded-xl border p-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-y" style="background:var(--card);border-color:var(--bd);color:var(--tx)" placeholder="اكتب بأي شكل... الاسم في سطر وبعديه الأصناف&#10;&#10;سعيد&#10;15 بيبسي كنز&#10;10 إندومي&#10;&#10;كابتن مصطفى نجار&#10;10&#10;3 بيبيسي 2 لتر"></textarea>
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="parseAndPreview()" class="qb flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"><i data-lucide="scan-text" class="w-4 h-4"></i> حلّل الشكك</button>
+                        <button onclick="clearTA()" class="px-4 py-2.5 rounded-xl font-semibold text-sm border hover:bg-gray-50 dark:hover:bg-gray-700" style="border-color:var(--bd);color:var(--mu)"><i data-lucide="eraser" class="w-4 h-4"></i></button>
+                    </div>
+                    <p class="text-xs mt-2" style="color:var(--mu)">اكتب اسم الشخص وبعديه الأصناف - كل شخص بينهم سطر فاضي (أو السطر اللي مفيش رقم بيتعامل كاسم جديد)</p>
+                </div>
+                <div id="cpv" class="mb-6"></div>
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                    <div class="flex-1 min-w-[200px] relative">
+                        <i data-lucide="search" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2" style="color:var(--mu)"></i>
+                        <input type="text" id="csh" oninput="renderC()" placeholder="بحث بالاسم..." class="w-full pr-9 pl-3 py-2 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500" style="background:var(--card);border-color:var(--bd);color:var(--tx)">
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="setCF('all')" data-f="all" class="cfb px-3 py-1.5 rounded-lg text-xs font-semibold">الكل</button>
+                        <button onclick="setCF('paid')" data-f="paid" class="cfb px-3 py-1.5 rounded-lg text-xs font-semibold">دفع</button>
+                        <button onclick="setCF('unpaid')" data-f="unpaid" class="cfb px-3 py-1.5 rounded-lg text-xs font-semibold">لسه مدفعش</button>
+                    </div>
+                    <select id="cso" onchange="renderC()" class="px-3 py-1.5 rounded-lg border text-xs outline-none" style="background:var(--card);border-color:var(--bd);color:var(--tx)">
+                        <option value="newest">أحدث عملية</option><option value="name">الاسم</option><option value="highest">أعلى مبلغ</option>
+                    </select>
+                </div>
+                <div id="csb" class="grid grid-cols-3 gap-2 mb-4"></div>
+                <div id="cl" class="space-y-4"></div>
+            </section>
+
+            <!-- البضاعة -->
+            <section id="page-merchandise" class="pg">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <h3 class="font-bold text-lg" style="color:var(--tx)">حسابات البضاعة</h3>
+                    <button onclick="addM()" class="qb bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-semibold text-sm flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> زوّد بضاعة</button>
+                </div>
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="flex-1 relative">
+                        <i data-lucide="search" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2" style="color:var(--mu)"></i>
+                        <input type="text" id="msh" oninput="renderM()" placeholder="بحث..." class="w-full pr-9 pl-3 py-2 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500" style="background:var(--card);border-color:var(--bd);color:var(--tx)">
+                    </div>
+                </div>
+                <div id="msb" class="grid grid-cols-3 gap-2 mb-4"></div>
+                <div id="ml" class="space-y-4"></div>
+            </section>
+
+            <!-- الأسعار -->
+            <section id="page-prices" class="pg">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <h3 class="font-bold text-lg" style="color:var(--tx)">أسعار المحل</h3>
+                    <button onclick="addP()" class="qb bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-semibold text-sm flex items-center gap-2"><i data-lucide="plus" class="w-4 h-4"></i> زوّد صنف</button>
+                </div>
+                <div class="relative mb-4">
+                    <i data-lucide="search" class="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2" style="color:var(--mu)"></i>
+                    <input type="text" id="psh" oninput="renderP()" placeholder="بحث في الأصناف..." class="w-full pr-9 pl-3 py-2 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-emerald-500" style="background:var(--card);border-color:var(--bd);color:var(--tx)">
+                </div>
+                <div id="pl" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </section>
+        </main>
+        <footer class="text-center py-4 text-xs" style="color:var(--mu)">أشرف مهندس محسن &copy; 2026</footer>
+    </div>
+
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 cs shadow-lg z-50 border-t" style="border-color:var(--bd)">
+        <div class="flex justify-around py-1">
+            <button onclick="switchPage('home')" data-page="home" class="bn flex flex-col items-center py-2 px-3 rounded-lg transition-all"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span class="text-[10px] mt-1">الرئيسية</span></button>
+            <button onclick="switchPage('customers')" data-page="customers" class="bn flex flex-col items-center py-2 px-3 rounded-lg transition-all"><i data-lucide="users" class="w-5 h-5"></i><span class="text-[10px] mt-1">الشكك</span></button>
+            <button onclick="switchPage('merchandise')" data-page="merchandise" class="bn flex flex-col items-center py-2 px-3 rounded-lg transition-all"><i data-lucide="package" class="w-5 h-5"></i><span class="text-[10px] mt-1">البضاعة</span></button>
+            <button onclick="switchPage('prices')" data-page="prices" class="bn flex flex-col items-center py-2 px-3 rounded-lg transition-all"><i data-lucide="store" class="w-5 h-5"></i><span class="text-[10px] mt-1">الأسعار</span></button>
+        </div>
+    </nav>
+    <div id="mo" class="fixed inset-0 bg-black/50 hidden" onclick="toggleMS()" style="z-index:45"></div>
+</div>
+<input type="file" id="if" accept=".json" class="hidden" onchange="hImp(event)">
+
+<script>
+// ==================== أدوات ====================
+function uuid(){return'xxxx-xxxx-4xxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&0x3|0x8)).toString(16)})}
+function esc(s){if(s==null)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
+function fmt(n){return(n||0).toLocaleString('ar-EG')}
+function fdt(d){if(!d)return'';return new Date(d).toLocaleDateString('ar-EG',{day:'2-digit',month:'2-digit',year:'numeric'})}
+function td(){return new Date().toISOString().split('T')[0]}
+function nw(){return new Date().toISOString()}
+function toWN(s){return s.replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d))}
+
+// ==================== التخزين ====================
+const SK='daftar_app_data_v2';
+
+function mkProducts(){
+    return [
+        {id:uuid(),name:'إندومي صغير',price:5,category:'سناكات',createdAt:nw()},
+        {id:uuid(),name:'إندومي كبير',price:10,category:'سناكات',createdAt:nw()},
+        {id:uuid(),name:'بيبيسي 1 لتر',price:40,category:'مرطبات',createdAt:nw()},
+        {id:uuid(),name:'بيبيسي 2 لتر',price:45,category:'مرطبات',createdAt:nw()},
+        {id:uuid(),name:'بيبيسي كنز',price:15,category:'مرطبات',createdAt:nw()},
+        {id:uuid(),name:'راني',price:20,category:'مرطبات',createdAt:nw()},
+        {id:uuid(),name:'مايه صغيرة',price:6,category:'مرطبات',createdAt:nw()},
+        {id:uuid(),name:'مايه كبيرة',price:12,category:'مرطبات',createdAt:nw()},
+        {id:uuid(),name:'مكرونه الملكة (كيس)',price:15,category:'مكرونه',createdAt:nw()},
+        {id:uuid(),name:'مكرونه بساطة',price:10,category:'مكرونه',createdAt:nw()},
+        {id:uuid(),name:'زيت',price:70,category:'زيوت',createdAt:nw()},
+        {id:uuid(),name:'عصير 1 لتر',price:30,category:'مرطبات',createdAt:nw()},
+        {id:uuid(),name:'السكر (1 كجم)',price:25,category:'مواد أساسية',createdAt:nw()},
+        {id:uuid(),name:'دقيق (1 كجم)',price:25,category:'مواد أساسية',createdAt:nw()},
+        {id:uuid(),name:'جبنة صغيرة',price:12,category:'ألبان',createdAt:nw()},
+        {id:uuid(),name:'فول',price:12,category:'معلبات',createdAt:nw()},
+        {id:uuid(),name:'صلصه',price:25,category:'معلبات',createdAt:nw()},
+        {id:uuid(),name:'جبنه دومتي',price:25,category:'ألبان',createdAt:nw()},
+        {id:uuid(),name:'بقسماط (أكياس)',price:15,category:'مخبوزات',createdAt:nw()},
+        {id:uuid(),name:'بقسماط (كيلو)',price:80,category:'مخبوزات',createdAt:nw()},
+        {id:uuid(),name:'البيضه',price:4,category:'ألبان',createdAt:nw()},
+        {id:uuid(),name:'نصف كرتونه بيض',price:55,category:'ألبان',createdAt:nw()},
+        {id:uuid(),name:'كرتونه بيض',price:110,category:'ألبان',createdAt:nw()},
+        {id:uuid(),name:'سردين',price:40,category:'معلبات',createdAt:nw()},
+        {id:uuid(),name:'بلوبيف كبيرة',price:100,category:'لحوم',createdAt:nw()},
+        {id:uuid(),name:'بلوبيف صغيرة',price:60,category:'لحوم',createdAt:nw()},
+        {id:uuid(),name:'لنشون (1 كيلو)',price:165,category:'لحوم',createdAt:nw()},
+        {id:uuid(),name:'رز (1 كيلو)',price:25,category:'مواد أساسية',createdAt:nw()},
+        {id:uuid(),name:'التونه',price:40,category:'معلبات',createdAt:nw()},
+        {id:uuid(),name:'كيك شيف',price:7,category:'حلويات',createdAt:nw()},
+        {id:uuid(),name:'فانيليا',price:2,category:'مواد أساسية',createdAt:nw()},
+        {id:uuid(),name:'نسكافيه / كوفي مكس',price:8,category:'مشروبات',createdAt:nw()},
+        {id:uuid(),name:'شاي صغير',price:10,category:'مشروبات',createdAt:nw()},
+        {id:uuid(),name:'شاي (صغير 100 جرام)',price:25,category:'مشروبات',createdAt:nw()},
+        {id:uuid(),name:'شاي كيلو',price:55,category:'مشروبات',createdAt:nw()},
+        {id:uuid(),name:'كباتشنو',price:10,category:'مشروبات',createdAt:nw()},
+        {id:uuid(),name:'كاتشب',price:25,category:'معلبات',createdAt:nw()},
+        {id:uuid(),name:'خل',price:10,category:'مواد أساسية',createdAt:nw()},
+        {id:uuid(),name:'طحينه',price:35,category:'مواد أساسية',createdAt:nw()},
+        {id:uuid(),name:'مربي',price:45,category:'معلبات',createdAt:nw()},
+    ];
+}
+
+let AD;
+function ld(){
+    try{
+        const r=localStorage.getItem(SK);
+        if(r){
+            AD=JSON.parse(r);
+            if(!AD.customers)AD.customers=[];
+            if(!AD.merchandise)AD.merchandise=[];
+            if(!AD.products||AD.products.length===0)AD.products=mkProducts();
+            if(!AD.settings)AD.settings={darkMode:false};
+        }else{
+            AD={customers:[],merchandise:[],products:mkProducts(),settings:{darkMode:false}};
+        }
+    }catch(e){
+        AD={customers:[],merchandise:[],products:mkProducts(),settings:{darkMode:false}};
+    }
+}
+function sd(){try{localStorage.setItem(SK,JSON.stringify(AD))}catch(e){console.error(e)}}
+
+// ==================== التطبيع والمطابقة (المُصلَح) ====================
+
+// خريطة إصلاح الأخطاء الإملائية لكلمة واحدة
+const WN={
+    'ببسي':'بيبيسي','بيبسى':'بيبيسي','بيبسي':'بيبيسي','بيبس':'بيبيسي','بيبيسى':'بيبيسي',
+    'جبنه':'جبنة','جبن':'جبنة',
+    'مايه':'مايه','ماية':'مايه','ميه':'مايه','ميا':'مايه',
+    'مكرونه':'مكرونه','مكرونة':'مكرونه',
+    'صلصه':'صلصه','صلصة':'صلصه',
+    'دومتي':'دومتي','دامتي':'دومتي',
+    'بيضه':'بيضه','بيضة':'بيضه',
+    'بلوبيف':'بلوبيف',
+    'لنشون':'لنشون','لانشون':'لنشون',
+    'رز':'رز','أرز':'رز','ارز':'رز',
+    'تونه':'تونه','تونة':'تونه',
+    'نسكافيه':'نسكافيه','نيسكافيه':'نسكافيه','نسكافيه':'نسكافيه',
+    'فانيليا':'فانيليا','فانيلا':'فانيليا',
+    'كباتشنو':'كباتشنو','كباتشبونو':'كباتشنو',
+    'كاتشب':'كاتشب','كاتشاب':'كاتشب',
+    'طحينه':'طحينه','طحينة':'طحينه',
+    'مربي':'مربي','مربى':'مربي','مربا':'مربي',
+    'اندومي':'إندومي','إندومي':'إندومي','ندومي':'إندومي',
+    'شيبسي':'شيبسي','شيبسى':'شيبسي',
+    'سكر':'السكر','دقيق':'دقيق',
+    'بقسماط':'بقسماط',
+    'شاي':'شاي','خل':'خل','زيت':'زيت','فول':'فول','سردين':'سردين',
+    'راني':'راني','قرصه':'قرصه','بن':'بن',
+    'كوفي':'كوفي','كوفى':'كوفي','مكس':'مكس',
+    'جرام':'جرام','كيلو':'كيلو','كجم':'كجم',
+    'لتر':'لتر','كنز':'كنز',
+    'صغير':'صغير','صغيره':'صغير','كبير':'كبير','كبيره':'كبير',
+    'صغ':'صغير','كب':'كبير',
+};
+
+// خريطة الاختصارات الشائعة → المنتج الافتراضي
+// لو المستخدم كتب كلمة واحدة بس، نحوّلها للمنتج الأكتر شيوعاً
+const PN={
+    'بيبيسي':'بيبيسي كنز','بيبسي':'بيبيسي كنز','ببسي':'بيبيسي كنز',
+    'مايه':'مايه صغيرة','ميه':'مايه صغيرة','ماية':'مايه صغيرة','ميا':'مايه صغيرة',
+    'جبنة':'جبنة صغيرة','جبنه':'جبنة صغيرة','جبن':'جبنة صغيرة',
+    'إندومي':'إندومي صغير','اندومي':'إندومي صغير','ندومي':'إندومي صغير',
+    'شاي':'شاي صغير',
+    'بيضه':'البيضه','بيضة':'البيضه',
+    'تونه':'التونه','تونة':'التونه',
+    'سكر':'السكر (1 كجم)','السكر':'السكر (1 كجم)',
+    'رز':'رز (1 كيلو)','ارز':'رز (1 كيلو)','أرز':'رز (1 كيلو)',
+    'لنشون':'لنشون (1 كيلو)','لانشون':'لنشون (1 كيلو)',
+    'مكرونه':'مكرونه بساطة','مكرونة':'مكرونه بساطة',
+    'بقسماط':'بقسماط (أكياس)',
+    'نسكافيه':'نسكافيه / كوفي مكس',
+    'كيك':'كيك شيف',
+    'عصير':'عصير 1 لتر',
+    'بلوبيف':'بلوبيف صغيرة',
+    'كاتشب':'كاتشب',
+    'طحينه':'طحينه',
+    'مربي':'مربي',
+    'فانيليا':'فانيليا',
+    'خل':'خل',
+    'زيت':'زيت',
+    'فول':'فول',
+    'صلصه':'صلصه',
+    'سردين':'سردين',
+    'شيبسي':'شيبسي',
+    'راني':'راني',
+};
+
+// تطبيع اسم منتج (يدعم الأسماء المركبة بالكامل)
+function normN(name){
+    if(!name)return'';
+    let n=name.trim();
+
+    // 1- تطبيع مباشر من خريطة العبارات
+    if(PN[n])return PN[n];
+
+    // 2- إزالة "ال" في البداية
+    let rr=n;
+    if(rr.startsWith('ال'))rr=rr.slice(2);
+    if(PN[rr])return PN[rr];
+
+    // 3- تطبيع كلمة بكلمة (إصلاح الأخطاء الإملائية)
+    const words=n.split(/\s+/);
+    const normWords=words.map(w=>WN[w]||w);
+    let joined=normWords.join(' ');
+
+    // 4- محاولة مطابقة العبارات بعد التطبيع
+    if(PN[joined])return PN[joined];
+
+    // 5- محاولة إزالة "ال" من الكلمة الأولى بعد التطبيع
+    if(joined.startsWith('ال')){
+        let j2=joined.slice(2);
+        if(PN[j2])return PN[j2];
+    }
+
+    // 6- لو كلمة واحدة، دور في PN
+    if(normWords.length===1&&PN[normWords[0]])return PN[normWords[0]];
+
+    // 7- لو عدد الكلمات 2+، حاول تطبيع العبارات الفرعية
+    // مثلاً: "بيبيسي لتر" → "بيبيسي كنز" (لو مفيش تطبيع، يرجع النص كما هو)
+    return joined;
+}
+
+// مطابقة منتج (محسّنة للأسماء المركبة)
+function findPr(inputName){
+    if(!AD.products||AD.products.length===0)return null;
+    const products=AD.products;
+
+    // 1- مطابقة تامة
+    let f=products.find(p=>p.name===inputName);
+    if(f)return f;
+
+    // 2- مطابقة بعد التطبيع
+    const ni=normN(inputName);
+    f=products.find(p=>p.name===ni);
+    if(f)return f;
+    f=products.find(p=>normN(p.name)===ni);
+    if(f)return f;
+
+    // 3- مطابقة شاملة: كل كلمات المدخل موجودة في اسم المنتج
+    // (باستثناء الأرقام المنفصلة زي "1" و"2")
+    const iw=ni.split(/\s+/).filter(w=>w.length>0&&!/^\d+$/.test(w));
+    if(iw.length>0){
+        // دور على المنتج اللي كل كلماته موجودة فيه
+        let bestMatch=null,bestScore=0;
+        for(const p of products){
+            const pn=normN(p.name);
+            const pw=pn.split(/\s+/).filter(w=>w.length>0);
+            // عدد كلمات المدخل الموجودة في المنتج
+            let score=0;
+            for(const w of iw){
+                if(pw.some(x=>x===w||x.includes(w)||w.includes(x)))score++;
+            }
+            // لازم كل كلمات المدخل تتحقق (أو على الأقل الأغلبية)
+            if(score>=Math.ceil(iw.length*0.7)&&score>bestScore){
+                bestScore=score;bestMatch=p;
+            }
+        }
+        if(bestMatch)return bestMatch;
+    }
+
+    // 4- مطابقة جزئية (المدخل جزء من اسم المنتج أو العكس)
+    // نفضّل المطابقة اللي أقرب في الطول
+    const partials=products.filter(p=>{
+        const pn=normN(p.name);
+        return pn.includes(ni)||ni.includes(pn);
+    });
+    if(partials.length>0){
+        partials.sort((a,b)=>Math.abs(normN(a.name).length-ni.length)-Math.abs(normN(b.name).length-ni.length));
+        return partials[0];
+    }
+
+    // 5- مطابقة بدون مسافات
+    const nc=ni.replace(/\s/g,'');
+    f=products.find(p=>p.name.replace(/\s/g,'')===nc||normN(p.name).replace(/\s/g,'')===nc);
+    if(f)return f;
+
+    return null;
+}
+
+// ==================== المحلل (المُصلَح بالكامل) ====================
+
+// تحليل سطر واحد (عنصر/بضاعة)
+function parseIL(line){
+    let l=line.trim();
+    if(!l)return null;
+
+    // تحويل الأرقام العربية/الهندية
+    l=toWN(l);
+    // تنظيف المسافات
+    l=l.replace(/\s+/g,' ').trim();
+
+    // استخراج الرقم الأول (الكمية)
+    const nm=l.match(/^(\d+)/);
+    if(!nm)return null; // مفيش رقم = مش عنصر
+
+    const qty=parseInt(nm[1],10);
+    let rest=l.slice(nm[0].length).trim();
+
+    // استخراج "+ X جنيه" (مبلغ إضافي)
+    let extraCash=0,extraNote='';
+    const ep=rest.match(/\+\s*(\d+)\s*جنيه?\s*(.*)/);
+    if(ep){
+        extraCash=parseInt(ep[1],10);
+        extraNote=(ep[2]||'').trim();
+        const pi=rest.indexOf('+');
+        rest=rest.substring(0,pi).trim();
+    }
+
+    // "جنيه" لوحده بعد رقم = مبلغ كاش
+    if(/^جنيه?\s*(.*)/.test(rest)){
+        const gnM=rest.match(/^جنيه?\s*(.*)/);
+        return{productName:'كاش',normalizedProduct:'كاش',qty:1,unitPrice:qty,total:qty,extraCash:0,extraNote:gnM[1]||'',priceFound:true,isCash:true};
+    }
+
+    if(rest){
+        // فيه اسم منتج (ممكن مركب من كذا كلمة)
+        const nn=normN(rest);
+        const prod=findPr(nn);
+        return{
+            productName:rest,       // الاسم الأصلي كما كتبه المستخدم
+            normalizedProduct:nn,   // الاسم بعد التطبيع
+            qty,
+            unitPrice:prod?prod.price:null,
+            total:prod?qty*prod.price:0,
+            extraCash,extraNote,
+            priceFound:!!prod
+        };
+    }else{
+        // رقم بس = مبلغ كاش
+        return{productName:'كاش',normalizedProduct:'كاش',qty:1,unitPrice:qty,total:qty,extraCash:0,extraNote:'',priceFound:true,isCash:true};
+    }
+}
+
+// تحليل النص الكامل (المُصلَح: يدعم الأسماء المركبة والأسماء بدون سطر فاضي)
+function parseT(text){
+    if(!text||!text.trim())return{customers:[],debug:[]};
+
+    // تطبيع نهايات السطور
+    let t=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+
+    // تقسيم لسطور
+    const allLines=t.split('\n').map(l=>l.trim());
+
+    const customers=[];
+    const debug=[];
+    let currentName=null;
+    let currentItems=[];
+    let currentOriginal=[];
+
+    // حفظ شخص ومنتجاته
+    function flush(){
+        if(currentName&&currentItems.length>0){
+            const total=currentItems.reduce((s,it)=>s+it.total+(it.extraCash||0),0);
+            customers.push({
+                id:uuid(),name:currentName,originalText:currentOriginal.join('\n'),
+                items:[...currentItems],total,paid:0,remaining:total,status:'unpaid',
+                payments:[],createdAt:nw(),updatedAt:nw()
+            });
+        }
+        currentName=null;currentItems=[];currentOriginal=[];
+    }
+
+    for(let i=0;i<allLines.length;i++){
+        const line=allLines[i];
+        if(!line)continue; // سطر فاضي = فاصل بين الأشخاص
+
+        const westernLine=toWN(line);
+        // هل السطر يبدأ برقم؟ (عنصر/بضاعة)
+        const startsWithNum=/^\d/.test(westernLine);
+
+        if(startsWithNum){
+            // هذا سطر عنصر (رقم + اسم منتج)
+            if(!currentName){
+                // أول سطر رقم من غير اسم قبله → نعتبره شخص بدون اسم
+                currentName='شخص';
+                debug.push({type:'name',text:'(شخص بدون اسم)'});
+            }
+            const item=parseIL(line);
+            if(item){
+                currentItems.push(item);
+                currentOriginal.push(line);
+                debug.push({
+                    type:'item',text:line,
+                    result:item.isCash?'كاش: '+item.total:(item.normalizedProduct+' ×'+item.qty+(item.priceFound?' = '+item.total+' ج':' ❌ سعر مش موجود')),
+                    ok:item.priceFound
+                });
+            }else{
+                debug.push({type:'item',text:line,result:'مقدرش أحلل السطر ده',ok:false});
+            }
+        }else{
+            // السطر مش رقم → اسم شخص (جديد)
+            // لو فيه شخص حالي بمنتجات → احفظه وابدأ شخص جديد
+            if(currentName&&currentItems.length>0){
+                flush();
+            }
+            // لو فيه اسم حالي من غير منتجات (اسم متكرر مثلاً) → حدّث الاسم
+            if(currentItems.length===0){
+                currentName=line;
+                currentOriginal=[line];
+                debug.push({type:'name',text:line});
+            }else{
+                // حالات نادرة: اسم جاء بعد منتجات من غير سطر فاضي
+                flush();
+                currentName=line;
+                currentOriginal=[line];
+                debug.push({type:'name',text:line});
+            }
+        }
+    }
+
+    // حفظ آخر شخص
+    flush();
+
+    return{customers,debug};
+}
+
+// ==================== الحالة ====================
+let CP='home',CF='all';
+function setCF(f){CF=f;renderC();uFB()}
+function uFB(){
+    document.querySelectorAll('.cfb').forEach(b=>{
+        const f=b.getAttribute('data-f');
+        if(f===CF){b.className='cfb px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 text-white';b.style.borderColor='';b.style.color=''}
+        else{b.className='cfb px-3 py-1.5 rounded-lg text-xs font-semibold border hover:bg-gray-50 dark:hover:bg-gray-700';b.style.borderColor='var(--bd)';b.style.color='var(--mu)'}
+    });
+}
+
+// ==================== التنقل ====================
+const PT={home:'الرئيسية',customers:'الشكك',merchandise:'البضاعة',prices:'الأسعار'};
+function switchPage(p){
+    CP=p;
+    document.querySelectorAll('.pg').forEach(x=>x.classList.remove('ac'));
+    const el=document.getElementById('page-'+p);if(el)el.classList.add('ac');
+    document.getElementById('pt').textContent=PT[p]||'';
+    document.querySelectorAll('.sl').forEach(b=>{const q=b.getAttribute('data-page');if(q===p){b.classList.add('bg-emerald-50','dark:bg-emerald-900/30','text-emerald-700','dark:text-emerald-400');b.style.color=''}else{b.classList.remove('bg-emerald-50','dark:bg-emerald-900/30','text-emerald-700','dark:text-emerald-400');b.style.color='var(--mu)'}});
+    document.querySelectorAll('.bn').forEach(b=>{const q=b.getAttribute('data-page');if(q===p){b.classList.add('text-emerald-600');b.classList.remove('text-gray-400','dark:text-gray-500')}else{b.classList.remove('text-emerald-600');b.classList.add('text-gray-400','dark:text-gray-500')}});
+    if(p==='home')renderH();else if(p==='customers')renderC();else if(p==='merchandise')renderM();else if(p==='prices')renderP();
+    lucide.createIcons();closeMS();
+}
+function toggleMS(){const s=document.getElementById('sidebar'),o=document.getElementById('mo');s.classList.toggle('hidden');s.classList.add('flex');o.classList.toggle('hidden')}
+function closeMS(){if(window.innerWidth<1024){document.getElementById('sidebar').classList.add('hidden');document.getElementById('sidebar').classList.remove('flex');document.getElementById('mo').classList.add('hidden')}}
+
+// ==================== إشعارات ====================
+function toast(t,ic='success'){const T=Swal.mixin({toast:true,position:'top',showConfirmButton:false,timer:2500,timerProgressBar:true,didOpen:x=>{x.onmouseenter=Swal.stopTimer;x.onmouseleave=Swal.resumeTimer}});T.fire({icon:ic,title:t,html:''})}
+
+// ==================== الرئيسية ====================
+function renderH(){
+    const tc=AD.customers.length,tp=AD.customers.reduce((s,c)=>s+c.paid,0),tr=AD.customers.reduce((s,c)=>s+c.remaining,0),tm=AD.merchandise.reduce((s,m)=>s+(m.totalAmount-m.paid),0);
+    document.getElementById('hs').innerHTML=`
+        <div class="cs rounded-2xl p-4 shadow-sm"><div class="flex items-center gap-2 mb-2"><div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center"><i data-lucide="users" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i></div><span class="text-xs font-semibold" style="color:var(--mu)">إجمالي الشكك</span></div><p class="text-2xl font-bold" style="color:var(--tx)">${fmt(tc)}</p></div>
+        <div class="cs rounded-2xl p-4 shadow-sm"><div class="flex items-center gap-2 mb-2"><div class="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/40 flex items-center justify-center"><i data-lucide="badge-check" class="w-4 h-4 text-green-600 dark:text-green-400"></i></div><span class="text-xs font-semibold" style="color:var(--mu)">المدفوع</span></div><p class="text-2xl font-bold text-green-600">${fmt(tp)}</p></div>
+        <div class="cs rounded-2xl p-4 shadow-sm"><div class="flex items-center gap-2 mb-2"><div class="w-8 h-8 rounded-lg bg-red-100 dark:bg-red-900/40 flex items-center justify-center"><i data-lucide="alert-circle" class="w-4 h-4 text-red-500 dark:text-red-400"></i></div><span class="text-xs font-semibold" style="color:var(--mu)">المتبقي</span></div><p class="text-2xl font-bold text-red-500">${fmt(tr)}</p></div>
+        <div class="cs rounded-2xl p-4 shadow-sm"><div class="flex items-center gap-2 mb-2"><div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center"><i data-lucide="package" class="w-4 h-4 text-amber-600 dark:text-amber-400"></i></div><span class="text-xs font-semibold" style="color:var(--mu)">بضاعة متبقية</span></div><p class="text-2xl font-bold text-amber-600">${fmt(tm)}</p></div>`;
+    document.getElementById('hq').innerHTML=`
+        <button onclick="switchPage('customers')" class="qb cs rounded-2xl p-4 shadow-sm flex flex-col items-center gap-2"><i data-lucide="users" class="w-6 h-6 text-emerald-600"></i><span class="text-xs font-semibold" style="color:var(--tx)">الشكك</span></button>
+        <button onclick="switchPage('merchandise')" class="qb cs rounded-2xl p-4 shadow-sm flex flex-col items-center gap-2"><i data-lucide="package" class="w-6 h-6 text-amber-600"></i><span class="text-xs font-semibold" style="color:var(--tx)">البضاعة</span></button>
+        <button onclick="switchPage('prices')" class="qb cs rounded-2xl p-4 shadow-sm flex flex-col items-center gap-2"><i data-lucide="store" class="w-6 h-6 text-purple-600"></i><span class="text-xs font-semibold" style="color:var(--tx)">أسعار المحل</span></button>`;
+    const re=document.getElementById('hr');const acts=[];
+    AD.customers.forEach(c=>{acts.push({t:'c',n:c.name,d:c.createdAt,ds:'شيك جديد - '+fmt(c.total)+' ج'});c.payments.forEach(p=>acts.push({t:'p',n:c.name,d:p.date,ds:'دفعة '+fmt(p.amount)+' ج'}))});
+    AD.merchandise.forEach(m=>m.payments.forEach(p=>acts.push({t:'mp',n:m.name,d:p.date,ds:'دفعة بضاعة '+fmt(p.amount)+' ج'})));
+    acts.sort((a,b)=>new Date(b.d)-new Date(a.d));const rc=acts.slice(0,8);
+    if(rc.length===0)re.innerHTML=`<p class="text-sm text-center py-8" style="color:var(--mu)">مفيش عمليات لسه</p>`;
+    else re.innerHTML=rc.map(a=>`<div class="cs rounded-xl px-4 py-3 shadow-sm flex items-center gap-3"><div class="w-8 h-8 rounded-lg flex items-center justify-center ${a.t==='p'||a.t==='mp'?'bg-green-100 dark:bg-green-900/30':'bg-emerald-100 dark:bg-emerald-900/30'}"><i data-lucide="${a.t==='p'||a.t==='mp'?'arrow-down-left':'user-plus'}" class="w-4 h-4 ${a.t==='p'||a.t==='mp'?'text-green-600':'text-emerald-600'}"></i></div><div class="flex-1 min-w-0"><p class="text-sm font-semibold truncate" style="color:var(--tx)">${esc(a.n)}</p><p class="text-xs" style="color:var(--mu)">${esc(a.ds)}</p></div><span class="text-xs whitespace-nowrap" style="color:var(--mu)">${fdt(a.d)}</span></div>`).join('');
+    lucide.createIcons();if(typeof AOS!=='undefined')AOS.refresh();
+}
+
+// ==================== الشكك ====================
+function parseAndPreview(){
+    const text=document.getElementById('cta').value;
+    if(!text.trim()){Swal.fire({icon:'info',title:'مفيش نص!',text:'حط الشكك في المربع وبعدين اضغط حلّل',confirmButtonText:'فهمت',confirmButtonColor:'#059669'});return}
+    const{customers:parsed,debug}=parseT(text);
+    const pv=document.getElementById('cpv');
+    let html='<div class="mb-4">';
+    html+='<details class="cs rounded-xl p-3 shadow-sm mb-4" open><summary class="font-semibold text-sm cursor-pointer mb-2" style="color:var(--mu)">تفاصيل التحليل</summary><div class="space-y-1">';
+    debug.forEach(d=>{
+        if(d.type==='name')html+=`<div class="debug-line debug-name">👤 ${esc(d.text)}</div>`;
+        else html+=`<div class="debug-line ${d.ok?'debug-ok':'debug-fail'}">${d.ok?'✅':'❌'} ${esc(d.text)} ← ${esc(d.result)}</div>`;
+    });
+    html+='</div></details>';
+    if(parsed.length===0){
+        html+=`<div class="cs rounded-xl p-4 shadow-sm text-center"><p class="text-sm font-semibold text-amber-600 mb-2">مقدرش أستخرج شكك من النص ده</p><p class="text-xs" style="color:var(--mu)">تأكد إن كل اسم شخص في سطر لوحده والأصناف تحته</p><pre class="text-xs bg-gray-100 dark:bg-gray-800 rounded-lg p-2 mt-2 text-right" style="color:var(--tx)">سعيد
+15 بيبسي كنز
+10 إندومي
+
+كابتن مصطفى نجار
+3 بيبيسي 1 لتر
+10</pre></div>`;
+        pv.innerHTML=html+'</div>';lucide.createIcons();return;
+    }
+    html+=`<h3 class="font-bold text-lg mb-3" style="color:var(--tx)">معاينة (${parsed.length} شكك)</h3><div class="space-y-4">`;
+    parsed.forEach(c=>{
+        html+=`<div class="cs rounded-2xl p-4 shadow-sm border-r-4 border-emerald-500"><p class="font-bold text-lg mb-2" style="color:var(--tx)">${esc(c.name)}</p><div class="space-y-1 mb-3">`;
+        c.items.forEach(it=>{
+            if(it.isCash)html+=`<p class="text-sm" style="color:var(--mu)">مبلغ: ${fmt(it.total)} ج</p>`;
+            else{
+                html+=`<p class="text-sm" style="color:var(--mu)">${esc(it.normalizedProduct||it.productName)} &times; ${fmt(it.qty)}`;
+                if(it.priceFound)html+=` <span class="text-xs">(الوحدة: ${fmt(it.unitPrice)} ج = ${fmt(it.total)} ج)</span>`;
+                else html+=` <span class="pm text-xs px-1.5 py-0.5 rounded">السعر مش موجود</span>`;
+                if(it.extraCash>0)html+=` <span class="text-xs text-amber-600">+ ${fmt(it.extraCash)} ج ${esc(it.extraNote)}</span>`;
+                html+='</p>';
+            }
+        });
+        html+=`</div><p class="font-bold text-emerald-600">الإجمالي: ${fmt(c.total)} ج</p></div>`;
+    });
+    html+=`</div><div class="flex gap-2 mt-4"><button onclick="confirmSave()" class="qb flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"><i data-lucide="save" class="w-4 h-4"></i> اتحفظ يا هندسة</button><button onclick="cancelPV()" class="px-4 py-2.5 rounded-xl font-semibold text-sm border hover:bg-gray-50 dark:hover:bg-gray-700" style="border-color:var(--bd);color:var(--mu)">إلغاء</button></div>`;
+    pv.innerHTML=html+'</div>';window._pc=parsed;lucide.createIcons();
+}
+function confirmSave(){if(!window._pc)return;AD.customers.push(...window._pc);sd();window._pc=null;document.getElementById('cpv').innerHTML='';document.getElementById('cta').value='';renderC();toast('اتحفظ يا هندسة')}
+function cancelPV(){window._pc=null;document.getElementById('cpv').innerHTML=''}
+function clearTA(){document.getElementById('cta').value='';cancelPV()}
+
+function renderC(){
+    const sh=(document.getElementById('csh')||{}).value?.trim().toLowerCase()||'';
+    const so=(document.getElementById('cso')||{}).value||'newest';
+    let list=[...AD.customers];
+    if(sh)list=list.filter(c=>c.name.toLowerCase().includes(sh));
+    if(CF==='paid')list=list.filter(c=>c.status==='paid');
+    else if(CF==='unpaid')list=list.filter(c=>c.status==='unpaid');
+    if(so==='name')list.sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+    else if(so==='newest')list.sort((a,b)=>new Date(b.updatedAt)-new Date(a.updatedAt));
+    else if(so==='highest')list.sort((a,b)=>b.total-a.total);
+    const al=AD.customers,ta=al.reduce((s,c)=>s+c.total,0),pa=al.reduce((s,c)=>s+c.paid,0),ra=al.reduce((s,c)=>s+c.remaining,0);
+    document.getElementById('csb').innerHTML=`<div class="cs rounded-xl p-3 text-center shadow-sm"><p class="text-xs" style="color:var(--mu)">الحساب الكلي</p><p class="font-bold text-emerald-600">${fmt(ta)}</p></div><div class="cs rounded-xl p-3 text-center shadow-sm"><p class="text-xs" style="color:var(--mu)">المدفوع</p><p class="font-bold text-green-600">${fmt(pa)}</p></div><div class="cs rounded-xl p-3 text-center shadow-sm"><p class="text-xs" style="color:var(--mu)">المتبقي</p><p class="font-bold text-red-500">${fmt(ra)}</p></div>`;
+    const le=document.getElementById('cl');
+    if(list.length===0){le.innerHTML=`<div class="text-center py-12"><i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3" style="color:var(--mu)"></i><p class="text-sm" style="color:var(--mu)">مفيش شكك لسه</p></div>`;lucide.createIcons();return}
+    le.innerHTML=list.map(c=>rCC(c)).join('');lucide.createIcons();uFB();
+}
+
+function rCC(c){
+    const sb=c.status==='paid'?'<span class="bp px-2 py-0.5 rounded-full text-xs font-semibold">دفع</span>':'<span class="bu px-2 py-0.5 rounded-full text-xs font-semibold">لسه مدفعش</span>';
+    let ih=c.items.map(it=>{
+        if(it.isCash)return`<div class="flex justify-between text-sm py-1" style="color:var(--mu)"><span>مبلغ كاش</span><span class="font-semibold">${fmt(it.total)} ج</span></div>`;
+        const pi=it.priceFound?`<span class="text-xs">(الوحدة: ${fmt(it.unitPrice)} ج)</span>`:`<span class="pm text-xs px-1.5 py-0.5 rounded cursor-pointer" onclick="addMP('${esc(it.normalizedProduct||it.productName)}')">السعر مش موجود - اضغط هنا</span>`;
+        const eh=it.extraCash>0?`<span class="text-xs text-amber-600 block">+ ${fmt(it.extraCash)} ج ${esc(it.extraNote||'')}</span>`:'';
+        return`<div class="py-1"><div class="flex justify-between text-sm" style="color:var(--mu)"><span>${esc(it.normalizedProduct||it.productName)} &times; ${fmt(it.qty)} ${pi}</span><span class="font-semibold">${it.priceFound?fmt(it.total)+' ج':'---'}</span></div>${eh}</div>`;
+    }).join('');
+    let ph='';if(c.payments&&c.payments.length>0){ph=`<div class="mt-3 pt-3 border-t" style="border-color:var(--bd)"><p class="text-xs font-semibold mb-2" style="color:var(--mu)">سجل الدفعات</p>${c.payments.map(p=>`<div class="flex justify-between text-xs py-1" style="color:var(--mu)"><span>${fdt(p.date)}${p.note?' - '+esc(p.note):''}</span><span class="text-green-600 font-semibold">${fmt(p.amount)} ج</span></div>`).join('')}</div>`}
+    return`<div class="cc cs rounded-2xl shadow-sm overflow-hidden"><div class="p-4"><div class="flex items-center justify-between mb-3"><h4 class="font-bold text-lg" style="color:var(--tx)">${esc(c.name)}</h4>${sb}</div><div class="divide-y" style="border-color:var(--bd)">${ih}</div><div class="mt-3 pt-3 border-t flex justify-between items-center" style="border-color:var(--bd)"><span class="font-bold" style="color:var(--tx)">الإجمالي</span><span class="font-bold text-emerald-600">${fmt(c.total)} ج</span></div><div class="flex justify-between text-sm" style="color:var(--mu)"><span>المدفوع</span><span class="text-green-600">${fmt(c.paid)} ج</span></div><div class="flex justify-between text-sm font-semibold" style="color:var(--tx)"><span>المتبقي</span><span class="${c.remaining>0?'text-red-500':'text-green-600'}">${fmt(c.remaining)} ج</span></div>${ph}</div><div class="px-4 pb-4 flex flex-wrap gap-2"><button onclick="tCS('${c.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${c.status==='paid'?'bg-red-50 dark:bg-red-900/20 text-red-600 hover:bg-red-100':'bg-green-50 dark:bg-green-900/20 text-green-600 hover:bg-green-100'} transition-all">${c.status==='paid'?'لسه مدفعش':' دفع'}</button><button onclick="aCP('${c.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 hover:bg-emerald-100 transition-all">تسجيل دفعة</button><button onclick="eC('${c.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 transition-all" style="color:var(--mu)">تعديل</button><button onclick="dC('${c.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 dark:bg-red-900/20 text-red-500 hover:bg-red-100 transition-all">حذف</button></div></div>`;
+}
+
+function addMP(nn){
+    Swal.fire({title:'إضافة سعر',html:`<div class="text-right"><label class="block text-sm mb-1 font-semibold">اسم الصنف</label><input id="s-pn" value="${esc(nn)}" class="swal2-input text-right"><label class="block text-sm mb-1 font-semibold mt-2">السعر</label><input id="s-pp" type="number" class="swal2-input text-right" placeholder="السعر بالجنيه"><label class="block text-sm mb-1 font-semibold mt-2">الفئة</label><input id="s-pc" class="swal2-input text-right" placeholder="الفئة"></div>`,showCancelButton:true,confirmButtonText:'حفظ',cancelButtonText:'إلغاء',preConfirm:()=>{const n=document.getElementById('s-pn').value.trim(),p=parseFloat(document.getElementById('s-pp').value),c=document.getElementById('s-pc').value.trim();if(!n||!p||p<=0){Swal.showValidationMessage('لازم الاسم والسعر');return false}return{name:n,price:p,category:c||'عام'}}}).then(r=>{if(r.isConfirmed){AD.products.push({id:uuid(),name:r.value.name,price:r.value.price,category:r.value.category,createdAt:nw()});sd();rCP(r.value.name);renderC();toast('اتحفظ يا هندسة')}});
+}
+function rCP(nn){AD.customers.forEach(c=>{c.items.forEach(it=>{const inorm=normN(it.productName);if(inorm===nn||normN(inorm)===nn){const pr=findPr(inorm);if(pr&&!it.priceFound){it.unitPrice=pr.price;it.total=it.qty*pr.price;it.normalizedProduct=pr.name;it.priceFound=true}if(pr&&it.priceFound){it.unitPrice=pr.price;it.total=it.qty*pr.price;it.normalizedProduct=pr.name}}});c.total=c.items.reduce((s,it)=>s+it.total+(it.extraCash||0),0);c.remaining=c.total-c.paid;if(c.remaining<=0&&c.total>0)c.status='paid'});sd()}
+function tCS(id){const c=AD.customers.find(x=>x.id===id);if(!c)return;c.status=c.status==='paid'?'unpaid':'paid';c.updatedAt=nw();sd();renderC();toast(c.status==='paid'?'تم التسجيل كمدفوع':'تم التسجيل كغير مدفوع')}
+function aCP(id){
+    const c=AD.customers.find(x=>x.id===id);if(!c)return;
+    Swal.fire({title:'تسجيل دفعة - '+c.name,html:`<div class="text-right"><label class="block text-sm mb-1 font-semibold">دفعت كام؟</label><input id="s-a" type="number" class="swal2-input text-right" placeholder="المبلغ"><label class="block text-sm mb-1 font-semibold mt-2">التاريخ</label><input id="s-d" type="date" value="${td()}" class="swal2-input text-right"><label class="block text-sm mb-1 font-semibold mt-2">ملاحظة</label><input id="s-n" class="swal2-input text-right" placeholder="ملاحظة اختيارية"></div>`,showCancelButton:true,confirmButtonText:'سجّل',cancelButtonText:'إلغاء',preConfirm:()=>{const a=parseFloat(document.getElementById('s-a').value),d=document.getElementById('s-d').value,n=document.getElementById('s-n').value.trim();if(!a||a<=0){Swal.showValidationMessage('لازم مبلغ أكبر من صفر');return false}return{amount:a,date:d,note:n}}}).then(r=>{if(r.isConfirmed){c.payments.push({id:uuid(),amount:r.value.amount,date:r.value.date,note:r.value.note});c.paid=c.payments.reduce((s,p)=>s+p.amount,0);c.remaining=c.total-c.paid;if(c.remaining<=0)c.status='paid';c.updatedAt=nw();sd();renderC();toast('تم تسجيل الدفعة')}});
+}
+function eC(id){
+    const c=AD.customers.find(x=>x.id===id);if(!c)return;
+    Swal.fire({title:'تعديل - '+c.name,html:`<div class="text-right"><label class="block text-sm mb-1 font-semibold">الاسم</label><input id="s-en" value="${esc(c.name)}" class="swal2-input text-right"><label class="block text-sm mb-1 font-semibold mt-2">النص الأصلي</label><textarea id="s-et" class="swal2-textarea text-right" rows="6">${esc(c.originalText||'')}</textarea></div>`,showCancelButton:true,confirmButtonText:'حفظ',cancelButtonText:'إلغاء',preConfirm:()=>{const n=document.getElementById('s-en').value.trim(),t=document.getElementById('s-et').value.trim();if(!n){Swal.showValidationMessage('لازم الاسم');return false}return{name:n,text:t}}}).then(r=>{if(r.isConfirmed){c.name=r.value.name;if(r.value.text){const rp=parseT(r.value.text);if(rp.customers.length>0){c.items=rp.customers[0].items;c.originalText=r.value.text;c.total=c.items.reduce((s,it)=>s+it.total+(it.extraCash||0),0);c.remaining=c.total-c.paid;if(c.remaining<=0&&c.total>0)c.status='paid'}}c.updatedAt=nw();sd();renderC();toast('تم التعديل')}});
+}
+function dC(id){Swal.fire({icon:'warning',title:'متأكد إنك عايز تمسح؟',text:'العملية دي مش هترجع!',showCancelButton:true,confirmButtonText:'امسح',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444'}).then(r=>{if(r.isConfirmed){AD.customers=AD.customers.filter(c=>c.id!==id);sd();renderC();toast('تم الحذف','info')}})}
+
+// ==================== البضاعة ====================
+function renderM(){
+    const sh=(document.getElementById('msh')||{}).value?.trim().toLowerCase()||'';
+    let list=[...AD.merchandise];if(sh)list=list.filter(m=>m.name.toLowerCase().includes(sh));list.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    const ta=AD.merchandise.reduce((s,m)=>s+m.totalAmount,0),pa=AD.merchandise.reduce((s,m)=>s+m.paid,0),ra=AD.merchandise.reduce((s,m)=>s+(m.totalAmount-m.paid),0);
+    document.getElementById('msb').innerHTML=`<div class="cs rounded-xl p-3 text-center shadow-sm"><p class="text-xs" style="color:var(--mu)">الحساب الكلي</p><p class="font-bold text-emerald-600">${fmt(ta)}</p></div><div class="cs rounded-xl p-3 text-center shadow-sm"><p class="text-xs" style="color:var(--mu)">المدفوع</p><p class="font-bold text-green-600">${fmt(pa)}</p></div><div class="cs rounded-xl p-3 text-center shadow-sm"><p class="text-xs" style="color:var(--mu)">المتبقي عليك</p><p class="font-bold text-red-500">${fmt(ra)}</p></div>`;
+    const le=document.getElementById('ml');
+    if(list.length===0){le.innerHTML=`<div class="text-center py-12"><i data-lucide="package-open" class="w-12 h-12 mx-auto mb-3" style="color:var(--mu)"></i><p class="text-sm" style="color:var(--mu)">مفيش بضاعة لسه</p></div>`;lucide.createIcons();return}
+    le.innerHTML=list.map(m=>rMC(m)).join('');lucide.createIcons();
+}
+function rMC(m){
+    const pd=m.paid||0,rm=m.totalAmount-pd,pct=m.totalAmount>0?Math.min(100,Math.round(pd/m.totalAmount*100)):0;
+    const lp=m.payments&&m.payments.length>0?m.payments[m.payments.length-1]:null;
+    let ph='';if(m.payments&&m.payments.length>0){ph=`<div class="mt-3 pt-3 border-t" style="border-color:var(--bd)"><p class="text-xs font-semibold mb-2" style="color:var(--mu)">سجل الدفعات</p>${m.payments.slice().reverse().map(p=>`<div class="flex justify-between text-xs py-1" style="color:var(--mu)"><span>${fdt(p.date)}${p.note?' - '+esc(p.note):''}</span><span class="text-green-600 font-semibold">${fmt(p.amount)} ج</span></div>`).join('')}</div>`}
+    return`<div class="cc cs rounded-2xl shadow-sm p-4"><div class="flex items-center justify-between mb-3"><h4 class="font-bold text-lg" style="color:var(--tx)">${esc(m.name)}</h4><span class="text-xs font-semibold px-2 py-0.5 rounded-full ${pct>=100?'bp':'bu'}">${pct>=100?'خلصان':pct+'%'}</span></div><div class="space-y-1 text-sm" style="color:var(--mu)"><div class="flex justify-between"><span>إجمالي الحساب</span><span class="font-semibold" style="color:var(--tx)">${fmt(m.totalAmount)} ج</span></div><div class="flex justify-between"><span>المدفوع</span><span class="font-semibold text-green-600">${fmt(pd)} ج</span></div><div class="flex justify-between"><span>المتبقي</span><span class="font-semibold ${rm>0?'text-red-500':'text-green-600'}">${fmt(rm)} ج</span></div></div><div class="pb mt-3 mb-1"><div class="pf" style="width:${pct}%"></div></div>${lp?`<p class="text-xs mb-2" style="color:var(--mu)">آخر دفعة: ${fdt(lp.date)} - ${fmt(lp.amount)} ج</p>`:''}${ph}<div class="flex flex-wrap gap-2 mt-3"><button onclick="aMPay('${m.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 hover:bg-emerald-100 transition-all">إضافة دفعة</button><button onclick="eM('${m.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 transition-all" style="color:var(--mu)">تعديل</button><button onclick="dM('${m.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 dark:bg-red-900/20 text-red-500 hover:bg-red-100 transition-all">حذف</button></div></div>`;
+}
+function addM(){Swal.fire({title:'زوّد بضاعة',html:`<div class="text-right"><label class="block text-sm mb-1 font-semibold">اسم البضاعة أو المورد</label><input id="s-mn" class="swal2-input text-right" placeholder="مثلاً: بيبسي"><label class="block text-sm mb-1 font-semibold mt-2">إجمالي المبلغ</label><input id="s-mt" type="number" class="swal2-input text-right" placeholder="المبلغ بالجنيه"></div>`,showCancelButton:true,confirmButtonText:'حفظ',cancelButtonText:'إلغاء',preConfirm:()=>{const n=document.getElementById('s-mn').value.trim(),t=parseFloat(document.getElementById('s-mt').value);if(!n||!t||t<=0){Swal.showValidationMessage('لازم الاسم والمبلغ');return false}return{name:n,totalAmount:t}}}).then(r=>{if(r.isConfirmed){AD.merchandise.push({id:uuid(),name:r.value.name,totalAmount:r.value.totalAmount,paid:0,payments:[],createdAt:nw(),updatedAt:nw()});sd();renderM();toast('اتحفظ يا هندسة')}})}
+function aMPay(id){
+    const m=AD.merchandise.find(x=>x.id===id);if(!m)return;
+    Swal.fire({title:'إضافة دفعة - '+m.name,html:`<div class="text-right"><label class="block text-sm mb-1 font-semibold">المبلغ</label><input id="s-ma" type="number" class="swal2-input text-right" placeholder="كام جنيه؟"><label class="block text-sm mb-1 font-semibold mt-2">التاريخ</label><input id="s-md" type="date" value="${td()}" class="swal2-input text-right"><label class="block text-sm mb-1 font-semibold mt-2">ملاحظة</label><input id="s-mn2" class="swal2-input text-right"></div>`,showCancelButton:true,confirmButtonText:'سجّل',cancelButtonText:'إلغاء',preConfirm:()=>{const a=parseFloat(document.getElementById('s-ma').value),d=document.getElementById('s-md').value,n=document.getElementById('s-mn2').value.trim();if(!a||a<=0){Swal.showValidationMessage('لازم مبلغ أكبر من صفر');return false}return{amount:a,date:d,note:n}}}).then(r=>{if(r.isConfirmed){m.payments.push({id:uuid(),amount:r.value.amount,date:r.value.date,note:r.value.note});m.paid=m.payments.reduce((s,p)=>s+p.amount,0);m.updatedAt=nw();sd();renderM();toast('تم تسجيل الدفعة')}});
+}
+function eM(id){const m=AD.merchandise.find(x=>x.id===id);if(!m)return;Swal.fire({title:'تعديل - '+m.name,html:`<div class="text-right"><label class="block text-sm mb-1 font-semibold">الاسم</label><input id="s-men" value="${esc(m.name)}" class="swal2-input text-right"><label class="block text-sm mb-1 font-semibold mt-2">إجمالي المبلغ</label><input id="s-met" type="number" value="${m.totalAmount}" class="swal2-input text-right"></div>`,showCancelButton:true,confirmButtonText:'حفظ',cancelButtonText:'إلغاء',preConfirm:()=>{const n=document.getElementById('s-men').value.trim(),t=parseFloat(document.getElementById('s-met').value);if(!n||!t||t<=0){Swal.showValidationMessage('لازم الاسم والمبلغ');return false}return{name:n,totalAmount:t}}}).then(r=>{if(r.isConfirmed){m.name=r.value.name;m.totalAmount=r.value.totalAmount;m.updatedAt=nw();sd();renderM();toast('تم التعديل')}})}
+function dM(id){Swal.fire({icon:'warning',title:'متأكد إنك عايز تمسح؟',text:'العملية دي مش هترجع!',showCancelButton:true,confirmButtonText:'امسح',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444'}).then(r=>{if(r.isConfirmed){AD.merchandise=AD.merchandise.filter(m=>m.id!==id);sd();renderM();toast('تم الحذف','info')}})}
+
+// ==================== الأسعار ====================
+function renderP(){
+    const sh=(document.getElementById('psh')||{}).value?.trim().toLowerCase()||'';
+    let list=[...AD.products];if(sh)list=list.filter(p=>p.name.toLowerCase().includes(sh)||(p.category&&p.category.toLowerCase().includes(sh)));
+    const le=document.getElementById('pl');
+    if(list.length===0){le.innerHTML=`<div class="col-span-full text-center py-12"><i data-lucide="tag-off" class="w-12 h-12 mx-auto mb-3" style="color:var(--mu)"></i><p class="text-sm" style="color:var(--mu)">مفيش أصناف لسه</p></div>`;lucide.createIcons();return}
+    le.innerHTML=list.map(p=>`<div class="cc cs rounded-2xl shadow-sm p-4 flex flex-col justify-between"><div><div class="flex items-center justify-between mb-2"><h4 class="font-bold" style="color:var(--tx)">${esc(p.name)}</h4><span class="text-xs px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600">${esc(p.category||'عام')}</span></div><p class="text-2xl font-bold text-emerald-600">${fmt(p.price)} <span class="text-sm font-normal">جنيه</span></p></div><div class="flex gap-2 mt-3"><button onclick="eP('${p.id}')" class="flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 transition-all text-center" style="color:var(--mu)">تعديل</button><button onclick="dP('${p.id}')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 dark:bg-red-900/20 text-red-500 hover:bg-red-100 transition-all">حذف</button></div></div>`).join('');
+    lucide.createIcons();
+}
+function addP(){Swal.fire({title:'زوّد صنف',html:`<div class="text-right"><label class="block text-sm mb-1 font-semibold">اسم المنتج</label><input id="s-pn2" class="swal2-input text-right" placeholder="الاسم"><label class="block text-sm mb-1 font-semibold mt-2">السعر</label><input id="s-pp2" type="number" class="swal2-input text-right" placeholder="السعر بالجنيه"><label class="block text-sm mb-1 font-semibold mt-2">الفئة</label><input id="s-pc2" class="swal2-input text-right" placeholder="الفئة"></div>`,showCancelButton:true,confirmButtonText:'حفظ',cancelButtonText:'إلغاء',preConfirm:()=>{const n=document.getElementById('s-pn2').value.trim(),p=parseFloat(document.getElementById('s-pp2').value),c=document.getElementById('s-pc2').value.trim();if(!n||!p||p<=0){Swal.showValidationMessage('لازم الاسم والسعر');return false}return{name:n,price:p,category:c||'عام'}}}).then(r=>{if(r.isConfirmed){AD.products.push({id:uuid(),name:r.value.name,price:r.value.price,category:r.value.category,createdAt:nw()});sd();renderP();toast('اتحفظ يا هندسة')}})}
+function eP(id){const p=AD.products.find(x=>x.id===id);if(!p)return;Swal.fire({title:'تعديل الصنف',html:`<div class="text-right"><label class="block text-sm mb-1 font-semibold">اسم المنتج</label><input id="s-epn" value="${esc(p.name)}" class="swal2-input text-right"><label class="block text-sm mb-1 font-semibold mt-2">السعر</label><input id="s-epp" type="number" value="${p.price}" class="swal2-input text-right"><label class="block text-sm mb-1 font-semibold mt-2">الفئة</label><input id="s-epc" value="${esc(p.category||'')}" class="swal2-input text-right"></div>`,showCancelButton:true,confirmButtonText:'حفظ',cancelButtonText:'إلغاء',preConfirm:()=>{const n=document.getElementById('s-epn').value.trim(),p2=parseFloat(document.getElementById('s-epp').value),c=document.getElementById('s-epc').value.trim();if(!n||!p2||p2<=0){Swal.showValidationMessage('لازم الاسم والسعر');return false}return{name:n,price:p2,category:c||'عام'}}}).then(r=>{if(r.isConfirmed){const on=normN(p.name);p.name=r.value.name;p.price=r.value.price;p.category=r.value.category;sd();rCP(on);rCP(normN(p.name));renderP();toast('تم التعديل')}})}
+function dP(id){Swal.fire({icon:'warning',title:'متأكد إنك عايز تمسح؟',text:'لو مسحت السعر، الحسابات الجديدة مش هتلاقيه',showCancelButton:true,confirmButtonText:'امسح',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444'}).then(r=>{if(r.isConfirmed){AD.products=AD.products.filter(p=>p.id!==id);sd();renderP();toast('تم الحذف','info')}})}
+
+// ==================== الوضع الداكن ====================
+function toggleDark(){const d=document.documentElement.classList.toggle('dark');AD.settings.darkMode=d;sd();uDI()}
+function uDI(){const d=document.documentElement.classList.contains('dark');document.querySelectorAll('[data-lucide="moon"],[data-lucide="sun"]').forEach(e=>{e.setAttribute('data-lucide',d?'sun':'moon')});lucide.createIcons()}
+function initDM(){if(AD.settings.darkMode)document.documentElement.classList.add('dark');uDI()}
+
+// ==================== تصدير/استيراد ====================
+function exportData(){const j=JSON.stringify(AD,null,2),b=new Blob([j],{type:'application/json'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='daftar_backup_'+td()+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);toast('تم التصدير')}
+function importData(){document.getElementById('if').click()}
+function hImp(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=function(x){try{const d=JSON.parse(x.target.result);if(!d.customers||!d.merchandise||!d.products){Swal.fire({icon:'error',title:'ملف مش صحيح!',confirmButtonText:'فهمت'});return}Swal.fire({icon:'warning',title:'استيراد البيانات؟',text:'البيانات الحالية هتتمسح',showCancelButton:true,confirmButtonText:'استيراد',cancelButtonText:'إلغاء',confirmButtonColor:'#059669'}).then(res=>{if(res.isConfirmed){AD=d;sd();renderAll();toast('تم الاستيراد')}})}catch(err){Swal.fire({icon:'error',title:'خطأ!',text:'مقدرش أقرأ الملف',confirmButtonText:'فهمت'})}};r.readAsText(f);e.target.value=''}
+function clearAllData(){Swal.fire({icon:'warning',title:'مسح كل البيانات؟',text:'كل حاجة هتتمسح!',showCancelButton:true,confirmButtonText:'امسح كل حاجة',cancelButtonText:'إلغاء',confirmButtonColor:'#ef4444'}).then(r=>{if(r.isConfirmed){AD={customers:[],merchandise:[],products:mkProducts(),settings:AD.settings};sd();renderAll();toast('تم مسح كل البيانات','info')}})}
+function renderAll(){renderH();renderC();renderM();renderP()}
+
+// ==================== التهيئة ====================
+function init(){ld();initDM();setTimeout(()=>{const ls=document.getElementById('ls');ls.classList.add('fo');setTimeout(()=>{ls.style.display='none';document.getElementById('app').classList.remove('hidden');switchPage('home');if(typeof AOS!=='undefined')AOS.init({duration:600,once:true,offset:50})},600)},2200)}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
